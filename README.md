@@ -1,26 +1,105 @@
 <p align="center">
-  <img src="./assets/al-janef-logo.png" alt="AL-JANEF" width="430">
+  <img src="./assets/social-preview.png" alt="JANEF ONE — One kernel. Every agent." width="100%">
 </p>
 
 <h1 align="center">JANEF ONE</h1>
-<p align="center"><strong>One kernel. Every agent.</strong></p>
+<p align="center"><strong>The control plane for AI coding agents.</strong></p>
 <p align="center">
-  A portable Agent Skill and hardened Python runtime for routing, state, WorkGraphs, skill security, multi-agent planning, authorization, evidence, and reproducible verification.
+  Claude Code · Codex · Gemini CLI · Cursor · OpenCode · Agent Skills-compatible runtimes
+</p>
+<p align="center">
+  Route work, control context, coordinate agents, gate risky actions, verify outcomes, and keep evidence — from one portable kernel.
 </p>
 
-<p align="center"><a href="./README_AR.md">العربية</a> · <a href="./README.md">English</a></p>
+<p align="center">
+  <a href="./README_AR.md">العربية</a> ·
+  <a href="./docs/DEMO.md">Demo</a> ·
+  <a href="./references/ARCHITECTURE.md">Architecture</a> ·
+  <a href="./SECURITY.md">Security</a> ·
+  <a href="https://github.com/AL-JANEF/janef-one/releases/latest">Latest release</a>
+</p>
 
 <p align="center">
   <a href="https://github.com/AL-JANEF/janef-one/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/AL-JANEF/janef-one/ci.yml?branch=main&label=quality%20gate"></a>
+  <a href="https://github.com/AL-JANEF/janef-one/actions/workflows/codeql.yml"><img alt="CodeQL" src="https://img.shields.io/github/actions/workflow/status/AL-JANEF/janef-one/codeql.yml?branch=main&label=CodeQL"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-Apache--2.0-0b2748"></a>
   <img alt="Python" src="https://img.shields.io/badge/python-3.11%2B-00bcbc">
   <img alt="Agent Skills" src="https://img.shields.io/badge/Agent%20Skills-compatible-0b2748">
   <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-00bcbc">
 </p>
 
-## What JANEF ONE is
+> **Why JANEF ONE?** Agent stacks become fragile when routing, memory, permissions, verification, and overlapping skills are all handled ad hoc. JANEF ONE turns those concerns into one explicit orchestration layer.
 
-JANEF ONE is a **master orchestration layer** for agentic work. Instead of stacking dozens of generic skills into the context window, it keeps one small kernel in control and loads specialized capabilities only when they add unique value.
+## Start here
+
+### 1. Clone and validate
+
+```bash
+git clone https://github.com/AL-JANEF/janef-one.git
+cd janef-one
+python3 scripts/validate.py
+```
+
+### 2. Run without installing
+
+```bash
+PYTHONPATH=runtime python3 -m janef_one route "Research the latest framework release"
+PYTHONPATH=runtime python3 -m janef_one scan-skill .
+```
+
+### 3. Or install the runtime in an isolated environment
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e .
+janef-one --version
+```
+
+Then try:
+
+```bash
+janef-one route "Review this repository for release readiness"
+janef-one state ./.janef-one-state verify
+```
+
+For a guided walkthrough, see **[docs/DEMO.md](./docs/DEMO.md)** or run:
+
+```bash
+bash examples/quick-demo.sh
+```
+
+## What you get
+
+| Problem in agent workflows | JANEF ONE primitive |
+|---|---|
+| Conflicting instructions | deterministic instruction resolver |
+| Too many overlapping skills | capability registry + skill rating |
+| Context bloat | budgeted context governor |
+| Long, dependent tasks | WorkGraph DAG execution |
+| Multi-agent duplication | bounded scheduler |
+| Unsafe side effects | fail-closed authorization gate |
+| Untrusted third-party skills | static Skill Firewall |
+| “Done” without proof | evidence ledger + verifier |
+| Interrupted sessions | persistent state + recovery |
+| Regressions between releases | executable benchmark + quality gate |
+
+## Proof, not promises
+
+The v1.0.0 release gate currently records:
+
+- **102/102** unit and integration tests passing;
+- **1,970/1,970** deterministic runtime benchmark checks passing;
+- **90.03%** measured runtime coverage;
+- **100/100** self-firewall score with an `allow` decision;
+- clean wheel installation and CLI smoke tests passing;
+- reproducible ZIP packaging with identical SHA-256 on repeat builds;
+- CI passing on Python **3.11, 3.12, and 3.13**;
+- CodeQL enabled on the repository.
+
+These are deterministic repository checks. They are **not** presented as a universal claim that JANEF ONE outperforms every competing agent framework on every workload. Public cross-agent A/B evaluation is part of the roadmap.
+
+## One kernel instead of a pile of generic skills
 
 ```text
 USER / PROJECT INTENT
@@ -28,7 +107,7 @@ USER / PROJECT INTENT
         ▼
 ┌──────────────────────────┐
 │        JANEF ONE         │
-│  resolve • route • gate  │
+│ resolve • route • gate   │
 └────────────┬─────────────┘
              │
    ┌─────────┼─────────┐
@@ -44,17 +123,20 @@ Research   Coding    Tools / Files / Browser
      Evidence-backed result
 ```
 
-JANEF ONE does **not** override a host model's system instructions, safety controls, permissions, or actual tool availability. It operates at the user/project orchestration layer.
+JANEF ONE does **not** override host system instructions, safety controls, permissions, or actual tool availability. It operates at the user/project orchestration layer.
 
-## Why it exists
+## Designed for agent builders
 
-Agent ecosystems are getting larger, but more skills do not automatically produce better agents. Overlapping instructions increase context cost, routing errors, authority conflicts, and false completion claims. JANEF ONE addresses that with a single orchestration contract:
+JANEF ONE is useful when you are building or operating:
 
-**UNDERSTAND → RESOLVE → ROUTE → GATHER → EXECUTE → VERIFY → REPORT**
+- AI coding workflows across multiple agent runtimes;
+- autonomous or semi-autonomous engineering agents;
+- reusable Agent Skills with security boundaries;
+- multi-step research and implementation pipelines;
+- agent systems that need auditable state, authorization, and completion evidence;
+- internal AI engineering standards that must survive model/runtime changes.
 
-A subordinate skill is loaded only when it contributes domain knowledge, a required format, or a capability contract not already covered by the kernel.
-
-## v1.0 capabilities
+## Core capabilities
 
 | Capability | What it provides |
 |---|---|
@@ -71,60 +153,25 @@ A subordinate skill is loaded only when it contributes domain knowledge, a requi
 | Evidence Ledger | evidence-backed completion and integrity records |
 | Benchmark Harness | deterministic regression and release checks |
 
-## Quick start
+## Supported environments
 
-### Use it as an Agent Skill
+The repository includes adapter notes for:
 
-Clone the repository and place the `janef-one` directory in the Agent Skills location supported by your host runtime, or reference `SKILL.md` at project level.
+**Claude Chat · Claude Code · Codex · Gemini CLI · Cursor · OpenCode · generic Agent Skills-compatible runtimes**
 
-```bash
-git clone https://github.com/AL-JANEF/janef-one.git
-cd janef-one
-python3 scripts/validate.py
-```
-
-### Use the optional runtime
-
-```bash
-python3 -m pip install -e .
-janef-one --version
-janef-one route "Research the latest framework release"
-janef-one scan-skill ./path/to/a/skill
-janef-one state ./.janef-one-state verify
-```
-
-Without installing:
-
-```bash
-PYTHONPATH=runtime python3 -m janef_one route "Review this repository for release readiness"
-```
+Adapters are deployment guidance, not a claim of official endorsement by those vendors. Live host instructions and tool schemas always take precedence.
 
 ## Quality gate
 
-The release gate is executable and reproducible:
+Run the same release gate locally:
 
 ```bash
 python3 scripts/quality_gate.py
 ```
 
-It enforces package/spec validation, unit and integration tests, ≥90% runtime coverage, deterministic runtime benchmarks, syntax compilation, a self-firewall scan, clean-wheel installation, CLI smoke tests, and reproducible release packaging.
+`10/10` in this repository means **all defined release gates pass**. See [`references/BENCHMARK_PROTOCOL.md`](./references/BENCHMARK_PROTOCOL.md) for scope and methodology.
 
-`10/10` in this repository means **all defined release gates pass**. It is not a claim that no competing agent framework can ever outperform JANEF ONE on every workload.
-
-## v1.0 release evidence
-
-The current release gate records:
-
-- **102/102** unit and integration tests passing;
-- **1,970/1,970** deterministic runtime benchmark checks passing;
-- **90.03%** measured runtime coverage;
-- **100/100** self-firewall score with an `allow` decision;
-- clean-wheel installation and CLI smoke tests passing;
-- reproducible ZIP packaging with identical SHA-256 on repeat builds.
-
-These numbers describe the repository's deterministic release checks; they do not replace model-level A/B evaluation on real workloads.
-
-## Repository layout
+## Repository map
 
 ```text
 SKILL.md                  Agent Skills entry point
@@ -135,23 +182,11 @@ runtime/janef_one/        optional Python runtime primitives
 scripts/                  validation, benchmark, release and corpus utilities
 tests/                    deterministic runtime tests
 evals/                    behavioral seed cases
-adapters/                 Claude, Codex, Gemini CLI, Cursor, OpenCode notes
+adapters/                 host/runtime deployment notes
 providers/                provider-pattern research notes
 assets/                   project identity assets
-.github/                  CI, issue forms, PR template, Dependabot
+.github/                  CI, CodeQL, issue forms, PR templates, Dependabot
 ```
-
-## Source-fusion research
-
-JANEF ONE can optionally analyze a configured prompt-snapshot corpus as **research input**, not as runtime authority. The public release does not bundle third-party prompt corpora.
-
-```bash
-python3 scripts/update_all.py
-```
-
-The pipeline synchronizes sources, indexes them, extracts candidate operating rules, deduplicates candidates, and produces a fusion report. Provider-specific identity, stale tool contracts, hidden policy, or conflicting behavior is not promoted automatically.
-
-See [`SOURCE-MATRIX.md`](./SOURCE-MATRIX.md) and [`NOTICE`](./NOTICE).
 
 ## Security model
 
@@ -159,9 +194,29 @@ External skills and retrieved prompt material are untrusted by default. The bund
 
 See [`SECURITY.md`](./SECURITY.md) and [`references/SECURITY_MODEL.md`](./references/SECURITY_MODEL.md).
 
-## Supported agent environments
+## Source-fusion research
 
-JANEF ONE is designed to be portable. The repository includes deployment notes for Claude Chat, Claude Code, Codex, Gemini CLI, Cursor, OpenCode, and generic Agent Skills-compatible runtimes. Live host instructions and tool schemas always take precedence over snapshot assumptions.
+JANEF ONE can optionally analyze a configured prompt-snapshot corpus as **research input**, not runtime authority. Third-party prompt corpora are not bundled in the public release.
+
+See [`SOURCE-MATRIX.md`](./SOURCE-MATRIX.md) and [`NOTICE`](./NOTICE).
+
+## Roadmap
+
+High-priority public work:
+
+1. cross-agent A/B benchmarks on real engineering tasks;
+2. simpler host-specific installation flows;
+3. more adversarial Skill Firewall fixtures;
+4. public examples and community-submitted workflows;
+5. measured context-cost and recovery benchmarks.
+
+See [`ROADMAP.md`](./ROADMAP.md).
+
+## Community
+
+Found a useful workflow? Open a **Showcase** issue and share what JANEF ONE changed for your agent setup.
+
+If JANEF ONE is useful to you, **star the repository**. It directly helps other agent builders discover the project.
 
 ## Contributing
 

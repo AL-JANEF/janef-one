@@ -1,0 +1,33 @@
+name: User showcase
+description: Share a real JANEF ONE workflow, integration, or result
+title: "[Showcase]: "
+labels: []
+body:
+  - type: input
+    id: runtime
+    attributes:
+      label: Agent/runtime
+      description: Claude Code, Codex, Gemini CLI, Cursor, OpenCode, generic Agent Skills runtime, or other
+      placeholder: Claude Code
+    validations:
+      required: true
+  - type: textarea
+    id: use-case
+    attributes:
+      label: What did you build?
+      description: Describe the workflow and why JANEF ONE was useful.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence or reproduction steps
+      description: Commands, screenshots, benchmark notes, repository links, or other reproducible details.
+    validations:
+      required: false
+  - type: checkboxes
+    id: public
+    attributes:
+      label: Public sharing
+      options:
+        - label: I am comfortable with this showcase being linked from JANEF ONE documentation.
