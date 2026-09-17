@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install package and release tooling
+        run: python -m pip install -e '.[dev]'
+      - name: Validate Agent Skill/package
+        run: python scripts/validate.py
+      - name: Unit and integration tests
+        run: python scripts/test_runtime.py
+      - name: Coverage gate
+        run: |
+          python -m coverage erase
+          python -m coverage run --source=runtime/janef_one -m unittest discover -s tests -p 'test_*.py'
+          python -m coverage report --fail-under=90
+      - name: Deterministic runtime benchmark
+        run: python scripts/benchmark_runtime.py
+      - name: Compile check
+        run: python -m compileall -q runtime scripts tests
+      - name: Self Skill Firewall
+        run: |
+          python -m janef_one scan-skill . > self-scan.json
+          python - <<'PY'
+          import json
+          data=json.load(open('self-scan.json'))
+          assert data['decision']=='allow', data
+          assert data['score']==100, data
+          PY
+      - name: Build wheel
+        run: python -m pip wheel . --no-deps --no-build-isolation -w dist
+      - name: Reproducible release package
+        run: |
+          python scripts/package_release.py
+          cp ../janef-one-v1.0.0.zip /tmp/one.zip
+          python scripts/package_release.py
+          cmp /tmp/one.zip ../janef-one-v1.0.0.zip

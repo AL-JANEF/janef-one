@@ -1,0 +1,75 @@
+{
+  "name": "janef-one",
+  "version": "1.0.0",
+  "maturity": "stable",
+  "kind": "sovereign-agent-orchestration-kernel",
+  "entrypoint": "SKILL.md",
+  "portable_kernel": "SYSTEM_CORE.md",
+  "runtime": {
+    "language": "python",
+    "minimum_version": "3.11",
+    "package": "runtime/janef_one"
+  },
+  "source_corpus": "https://github.com/asgeirtj/system_prompts_leaks",
+  "modules": [
+    "01-intent-router.md",
+    "02-instruction-resolver.md",
+    "03-tool-orchestrator.md",
+    "04-research-engine.md",
+    "05-coding-engine.md",
+    "06-browser-computer-engine.md",
+    "07-memory-context-engine.md",
+    "08-artifact-engine.md",
+    "09-analysis-decision-engine.md",
+    "10-critic-verifier.md",
+    "11-response-engine.md",
+    "12-security-authorization.md",
+    "13-multi-agent-engine.md",
+    "14-skill-supremacy.md",
+    "15-source-trust.md",
+    "16-persistent-state.md",
+    "17-workgraph-engine.md",
+    "18-skill-firewall.md",
+    "19-benchmark-regression.md",
+    "20-context-governor.md",
+    "21-recovery-engine.md",
+    "22-multi-agent-scheduler.md",
+    "23-skill-rating-engine.md",
+    "24-authorization-gate.md",
+    "25-evidence-ledger.md"
+  ],
+  "providers": [
+    "anthropic.md",
+    "copilot.md",
+    "cursor.md",
+    "google.md",
+    "microsoft.md",
+    "openai.md",
+    "other-providers.md",
+    "perplexity.md",
+    "xai.md"
+  ],
+  "adapters": [
+    "claude-chat.md",
+    "claude-code.md",
+    "codex.md",
+    "gemini-cli.md",
+    "cursor.md",
+    "opencode.md",
+    "generic-agent.md"
+  ],
+  "source_pipeline": [
+    "scripts/sync_sources.py",
+    "scripts/index_sources.py",
+    "scripts/extract_rules.py",
+    "scripts/build_fusion_layer.py",
+    "scripts/update_all.py"
+  ],
+  "quality_gates": [
+    "python3 scripts/validate.py",
+    "python3 scripts/test_runtime.py",
+    "python3 -m coverage run --source=runtime/janef_one -m unittest discover -s tests -p test_*.py",
+    "python3 scripts/benchmark_runtime.py",
+    "python3 scripts/quality_gate.py"
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "corpus": "https://github.com/asgeirtj/system_prompts_leaks",
+  "license_observed": "CC0-1.0 in repository LICENSE; third-party rights are explicitly not cleared by the repository licensor.",
+  "representative_sources_reviewed": [
+    "Anthropic/claude-fable-5.1.md",
+    "Anthropic/claude-code/claude-code-fable-5.1.md",
+    "OpenAI/gpt-5.6-sol.md",
+    "OpenAI/Codex/codex-full.md",
+    "Google/gemini-3.8-flash.md",
+    "Perplexity/deep-research.md",
+    "Cursor/cursor.md",
+    "Microsoft/copilot-cli.md"
+  ],
+  "provider_directories_observed": [
+    "Anthropic",
+    "Cursor",
+    "DeepSeek",
+    "GLM",
+    "Google",
+    "Kimi",
+    "Meta",
+    "Microsoft",
+    "Misc",
+    "Mistral",
+    "Notion",
+    "OpenAI",
+    "OpenCode",
+    "Perplexity",
+    "Pi",
+    "Qwen",
+    "xAI"
+  ]
+}
