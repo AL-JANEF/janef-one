@@ -1,60 +1,62 @@
 <p align="center">
-  <img src="./assets/al-janef-logo.png" alt="AL-JANEF" width="430">
+  <img src="./assets/social-preview.png" alt="JANEF ONE" width="100%">
 </p>
 
 <h1 align="center">JANEF ONE</h1>
-<p align="center"><strong>نواة واحدة. لكل وكيل.</strong></p>
-<p align="center">
-  مهارة Agent Skill محمولة مع Runtime مقسّى بلغة Python لتوجيه المهام، وإدارة الحالة، وWorkGraph، وفحص المهارات، والتفويض، والأدلة، والتحقق القابل لإعادة الإنتاج.
-</p>
+<p align="center"><strong>طبقة تحكم واحدة لوكلاء الذكاء الاصطناعي.</strong></p>
+<p align="center">Claude Code · Codex · Gemini CLI · Cursor · OpenCode</p>
 
-<p align="center"><a href="./README.md">English README</a></p>
+JANEF ONE نواة Orchestration محمولة لتنظيم التوجيه، السياق، WorkGraphs، الوكلاء المتعددين، صلاحيات العمليات الحساسة، فحص المهارات، الأدلة والتحقق من الإنجاز.
 
-## ما هو JANEF ONE؟
+[English](./README.md) · [Demo](./docs/DEMO.md) · [Architecture](./references/ARCHITECTURE.md) · [Security](./SECURITY.md)
 
-JANEF ONE هو **طبقة أوركسترا رئيسية** للعمل بالوكلاء. بدل تحميل عشرات المهارات العامة المتداخلة في السياق، يحافظ على Kernel صغير يتحكم في التوجيه وترتيب الصلاحيات والتحقق، ثم يحمّل المهارة المتخصصة فقط عندما تضيف معرفة أو قدرة فريدة.
-
-```text
-افهم → احسم التعليمات → وجّه → اجمع → نفّذ → تحقّق → أبلغ
-```
-
-لا يتجاوز JANEF ONE تعليمات النظام الفعلية أو سياسات السلامة أو الصلاحيات أو الأدوات المتاحة في بيئة التشغيل.
-
-## قدرات الإصدار 1.0
-
-- Instruction Resolver لحسم الأولوية والتعارض بصورة حتمية.
-- Capability Registry لاكتشاف القدرات المتاحة فعليًا.
-- Context Governor لضبط الميزانية وإزالة التكرار.
-- Persistent State بكتابة ذرية وسجل أحداث tamper-evident.
-- WorkGraph لتنفيذ DAG مع dependencies وretries وverification gates.
-- Recovery Manager لنقاط الاستعادة والفشل الجزئي.
-- Multi-Agent Scheduler لتفويض مضبوط مبني على التبعيات.
-- Skill Firewall لفحص المهارات قبل تحميلها.
-- Skill Rating لتقييم القيمة والتداخل والمخاطر.
-- Authorization Gate للعمليات ذات الأثر الخارجي أو غير القابلة للعكس.
-- Evidence Ledger لمنع ادعاءات الإنجاز بلا دليل.
-- Benchmark Harness وبوابات Regression قابلة لإعادة التنفيذ.
-
-## البدء السريع
+## ابدأ سريعًا
 
 ```bash
 git clone https://github.com/AL-JANEF/janef-one.git
 cd janef-one
-python3 -m pip install -e '.[dev]'
-python3 scripts/quality_gate.py
-janef-one --version
+python3 scripts/validate.py
+PYTHONPATH=runtime python3 -m janef_one route "Review this repository for release readiness"
 ```
 
-## معيار الإصدار
+أو شغّل العرض السريع:
 
-مصطلح `10/10` في هذا المستودع يعني أن **جميع بوابات الإصدار المعرفة داخل المشروع نجحت**: الاختبارات، التغطية، benchmark الحتمي، self-firewall، clean install، CLI smoke، recovery، reproducible packaging، وسلامة الإصدار. وهو ليس ادعاءً بأن المشروع لا يمكن التفوق عليه في كل مهمة مستقبلية.
+```bash
+bash examples/quick-demo.sh
+```
 
-## الأمان
+## الدليل التقني للإصدار v1.0.0
 
-تُعامل المهارات الخارجية ومصادر prompt snapshots كمدخلات غير موثوقة. لا تُضمّن corpora خارجية في الإصدارات العامة. راجع `SECURITY.md` و`NOTICE`.
+- **102/102** اختبارات Unit/Integration ناجحة.
+- **1,970/1,970** فحوص Benchmark حتمية ناجحة.
+- **90.03%** Runtime coverage.
+- **100/100** Self-firewall مع قرار `allow`.
+- CI ناجح على Python 3.11 و3.12 و3.13.
+- CodeQL مفعل.
+- بناء Release قابل لإعادة الإنتاج بنفس SHA-256.
 
-## الترخيص
+هذه الأرقام تخص بوابات المشروع الحتمية، ولا تعني ادعاء التفوق على كل إطار Agent في كل مهمة.
 
-Apache License 2.0.
+## لماذا JANEF ONE؟
 
-<p align="center"><strong>AL-JANEF · CODE • CREATE • BUILD</strong></p>
+بدل تكديس مهارات عامة متداخلة داخل الـcontext، يحتفظ JANEF ONE بنواة تحكم صغيرة ويحمّل القدرات المتخصصة فقط عندما تضيف قيمة فريدة. كما يفصل التنفيذ عن التحقق، ويعامل المهارات الخارجية والمدخلات المسترجعة كمصادر غير موثوقة حتى تجتاز البوابات المطلوبة.
+
+## أهم القدرات
+
+- Instruction Resolver
+- Capability Registry
+- Context Governor
+- Persistent State + Recovery
+- WorkGraph
+- Multi-Agent Scheduler
+- Skill Firewall
+- Skill Rating
+- Authorization Gate
+- Evidence Ledger
+- Benchmark / Regression Harness
+
+## المجتمع
+
+إذا استفدت من JANEF ONE، ضع **Star** للمستودع وشارك تجربتك عبر Showcase issue. هذا يساعد المشروع على الوصول لمطورين آخرين.
+
+Apache-2.0 · Built by **AL-JANEF**
