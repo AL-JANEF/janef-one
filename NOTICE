@@ -1,0 +1,8 @@
+JANEF ONE
+Copyright 2026 AL-JANEF
+
+JANEF ONE original code and documentation are licensed under Apache-2.0.
+
+This repository can optionally analyze third-party prompt snapshots from external repositories. Those snapshots are not bundled into JANEF ONE releases and are not relicensed by JANEF ONE. The configured research corpus currently declares CC0-1.0 at repository level while also noting that third-party rights may not be cleared. Users are responsible for evaluating provenance, rights, and permitted use of external source material.
+
+Provider names and trademarks belong to their respective owners. Provider research notes describe observed patterns and do not imply affiliation, endorsement, authenticity, or current vendor behavior.
