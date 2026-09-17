@@ -1,0 +1,25 @@
+name: Feature request
+description: Propose a capability or measurable improvement
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What concrete limitation does this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Verification plan
+      description: How should the improvement be tested or benchmarked?
+    validations:
+      required: true

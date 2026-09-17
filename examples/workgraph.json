@@ -1,0 +1,7 @@
+{
+  "nodes": [
+    {"id": "inspect", "action": "read", "depends_on": [], "requires_verification": true},
+    {"id": "change", "action": "edit", "depends_on": ["inspect"], "requires_verification": true},
+    {"id": "test", "action": "test", "depends_on": ["change"], "requires_verification": true}
+  ]
+}

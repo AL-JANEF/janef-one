@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "approvals": [
+    {
+      "fingerprint": "cb5386eb18eef5a190725a41bd4880c5d6849f51829b67f8d1971f255fc70168",
+      "reason": "Reviewed release-quality runner invokes fixed local commands with shell disabled and check=True."
+    },
+    {
+      "fingerprint": "e52a3bbb8fdbb875a70d238e51049af898449936ef0a5bca2ac1b7335f9a247f",
+      "reason": "Reviewed source synchronization invokes git with argument arrays and shell disabled."
+    },
+    {
+      "fingerprint": "8ff1c743407a90cd8aae487b972afef46fdcfee8285696da3aa3b8e84bfac319",
+      "reason": "Reviewed test wrapper invokes the local Python unittest runner with shell disabled."
+    },
+    {
+      "fingerprint": "2d0f6566f87b6c788383e4dba7eb132dafe36efd7e70a3ef5615824484cae62f",
+      "reason": "Reviewed fusion pipeline invokes only repository-owned Python scripts with shell disabled."
+    }
+  ]
+}

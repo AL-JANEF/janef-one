@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+.source_cache/
+.janef-one-state/
+sources/catalog.json
+sources/rule_candidates.json
+sources/FUSION_CANDIDATES.md
+.DS_Store
+.coverage
+htmlcov/
+benchmarks/runtime-report.json

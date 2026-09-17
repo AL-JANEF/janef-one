@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "janef-one-runtime"
+version = "1.0.0"
+description = "One kernel. Every agent. Runtime primitives for the JANEF ONE orchestration skill"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "Apache-2.0"}
+authors = [{name = "AL-JANEF"}]
+keywords = ["ai-agents", "agent-skills", "agent-orchestration", "multi-agent", "workgraph", "security"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: Apache Software License",
+]
+
+
+[project.urls]
+Homepage = "https://github.com/AL-JANEF/janef-one"
+Repository = "https://github.com/AL-JANEF/janef-one"
+Issues = "https://github.com/AL-JANEF/janef-one/issues"
+Changelog = "https://github.com/AL-JANEF/janef-one/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+dev = ["coverage>=7.6"]
+
+[project.scripts]
+janef-one = "janef_one.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "runtime"}
+
+[tool.setuptools.packages.find]
+where = ["runtime"]
+
+[tool.pytest.ini_options]
+pythonpath = ["runtime"]
