@@ -15,3 +15,4 @@ sources/FUSION_CANDIDATES.md
 .coverage
 htmlcov/
 benchmarks/runtime-report.json
+.serena/

@@ -3,6 +3,7 @@ name: CI
 on:
   push:
   pull_request:
+  workflow_call:
 
 permissions:
   contents: read
@@ -15,8 +16,8 @@ jobs:
       matrix:
         python-version: ["3.11", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
@@ -39,7 +40,16 @@ jobs:
         run: python -m compileall -q runtime scripts tests
       - name: Self Skill Firewall
         run: |
-          python -m janef_one scan-skill . > self-scan.json
+          # The active allowlist source must live outside the scanned candidate
+          # root (SkillFirewall enforces this). The reviewed repository
+          # allowlist is still trusted, since it is reviewed first-party
+          # repository state — it is just copied to an external temp path
+          # before being handed to the scanner so the candidate root cannot
+          # be its own approval source.
+          EXTERNAL_ALLOWLIST=$(mktemp)
+          trap 'rm -f "$EXTERNAL_ALLOWLIST"' EXIT
+          cp .janef-one-firewall-allowlist.json "$EXTERNAL_ALLOWLIST"
+          python -m janef_one scan-skill . --allowlist "$EXTERNAL_ALLOWLIST" > self-scan.json
           python - <<'PY'
           import json
           data=json.load(open('self-scan.json'))
@@ -49,8 +59,10 @@ jobs:
       - name: Build wheel
         run: python -m pip wheel . --no-deps --no-build-isolation -w dist
       - name: Reproducible release package
+        shell: bash
         run: |
+          VERSION=$(python -c 'import json; print(json.load(open("manifest.json"))["version"])')
           python scripts/package_release.py
-          cp ../janef-one-v1.0.0.zip /tmp/one.zip
+          cp "../janef-one-v${VERSION}.zip" /tmp/one.zip
           python scripts/package_release.py
-          cmp /tmp/one.zip ../janef-one-v1.0.0.zip
+          cmp /tmp/one.zip "../janef-one-v${VERSION}.zip"

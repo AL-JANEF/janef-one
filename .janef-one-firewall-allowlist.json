@@ -2,6 +2,54 @@
   "version": 1,
   "approvals": [
     {
+      "fingerprint": "0661dbcdc986156c5bf7cde4b8a23236034c388ed6466ad937557029af29a581",
+      "reason": "Reviewed release-quality runner invokes fixed local commands with shell disabled and check=True."
+    },
+    {
+      "fingerprint": "0d59fdcd3a821ca6f3064d3d26e6b76ea84f921ce850981973617295756b6c67",
+      "reason": "Reviewed firewall unit test source contains literal malicious-looking strings solely as scan-target fixtures; nothing here is executed as shell."
+    },
+    {
+      "fingerprint": "12c470fe93c746098556c73170fe4090ab015753e8d3798b26128d780f34121b",
+      "reason": "The scanner's own detection regex source text intentionally contains the strings it detects; this is reviewed first-party scanner code, not executed shell."
+    },
+    {
+      "fingerprint": "2d0f6566f87b6c788383e4dba7eb132dafe36efd7e70a3ef5615824484cae62f",
+      "reason": "Reviewed fusion pipeline invokes only repository-owned Python scripts with shell disabled."
+    },
+    {
+      "fingerprint": "32aab1166696ad1810c643c5cdefb2253aac5e42e714927de4d59f1126328464",
+      "reason": "The scanner's own detection regex source text intentionally contains the strings it detects; this is reviewed first-party scanner code, not executed shell."
+    },
+    {
+      "fingerprint": "5d327ad93da915f780bb1b9e13941fc7dc6e5ef118e54d6c07cdc8ce369ed69d",
+      "reason": "Reviewed firewall unit test source contains literal malicious-looking strings solely as scan-target fixtures; nothing here is executed as shell."
+    },
+    {
+      "fingerprint": "5e9b424f726029c2ecb4426c44e9aade44faa3c1f6301e56f3684d94be4cb446",
+      "reason": "Reviewed firewall unit test source contains literal malicious-looking strings solely as scan-target fixtures; nothing here is executed as shell."
+    },
+    {
+      "fingerprint": "618e3a9f2507d868cd74cb97438bc9c527f84a058cd79ca1ff55ef3284bc5fa4",
+      "reason": "Reviewed firewall unit test source contains literal malicious-looking strings solely as scan-target fixtures; nothing here is executed as shell."
+    },
+    {
+      "fingerprint": "7eeee8440ec0e92746077d4e55ec2745c370bff97e731af7be82049e0c39217d",
+      "reason": "The scanner's own detection regex source text intentionally contains the strings it detects; this is reviewed first-party scanner code, not executed shell."
+    },
+    {
+      "fingerprint": "8ff1c743407a90cd8aae487b972afef46fdcfee8285696da3aa3b8e84bfac319",
+      "reason": "Reviewed test wrapper invokes the local Python unittest runner with shell disabled."
+    },
+    {
+      "fingerprint": "9f5e91b2746d5814ad3b3f64d2eb5d92c9b34f23b5cd0964edeb59591a2d056e",
+      "reason": "Reviewed firewall unit test source contains literal malicious-looking strings solely as scan-target fixtures; nothing here is executed as shell."
+    },
+    {
+      "fingerprint": "ca79bef79a2b70db468c84e5e6dba6e678c0875f155c6720cb0baede5b8b872b",
+      "reason": "Reviewed skill-registry unit test source invokes the local Python subprocess module as a fixture; nothing here is executed as shell."
+    },
+    {
       "fingerprint": "cb5386eb18eef5a190725a41bd4880c5d6849f51829b67f8d1971f255fc70168",
       "reason": "Reviewed release-quality runner invokes fixed local commands with shell disabled and check=True."
     },
@@ -10,12 +58,12 @@
       "reason": "Reviewed source synchronization invokes git with argument arrays and shell disabled."
     },
     {
-      "fingerprint": "8ff1c743407a90cd8aae487b972afef46fdcfee8285696da3aa3b8e84bfac319",
-      "reason": "Reviewed test wrapper invokes the local Python unittest runner with shell disabled."
+      "fingerprint": "ed24940bda828324d2f372d0a15eb0abf7b1dccdc64ab4f5d6f0c36d8b06e8f9",
+      "reason": "Reviewed firewall unit test source contains literal malicious-looking strings solely as scan-target fixtures; nothing here is executed as shell."
     },
     {
-      "fingerprint": "2d0f6566f87b6c788383e4dba7eb132dafe36efd7e70a3ef5615824484cae62f",
-      "reason": "Reviewed fusion pipeline invokes only repository-owned Python scripts with shell disabled."
+      "fingerprint": "f5eb78c01f6ec12432e817f3a084f7575dbb88a92ce84e35a239833d90194955",
+      "reason": "Reviewed firewall unit test source contains literal malicious-looking strings solely as scan-target fixtures; nothing here is executed as shell."
     }
   ]
 }

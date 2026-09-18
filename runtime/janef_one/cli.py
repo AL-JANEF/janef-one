@@ -17,7 +17,7 @@ def _cmd_route(args: argparse.Namespace) -> int:
 
 
 def _cmd_scan(args: argparse.Namespace) -> int:
-    result = SkillFirewall().scan(args.path)
+    result = SkillFirewall(allowlist_path=args.allowlist).scan(args.path)
     payload = {
         "score": result.score,
         "decision": result.decision,
@@ -48,6 +48,16 @@ def build_parser() -> argparse.ArgumentParser:
 
     scan = sub.add_parser("scan-skill", help="statically scan an Agent Skill package")
     scan.add_argument("path", type=Path)
+    scan.add_argument(
+        "--allowlist",
+        type=Path,
+        default=None,
+        help=(
+            "path to a trusted reviewed-exception file (never auto-discovered "
+            "inside the scanned package; must be supplied explicitly by the "
+            "trusted caller/operator)"
+        ),
+    )
     scan.set_defaults(func=_cmd_scan)
 
     state = sub.add_parser("state", help="inspect or verify persistent state")
