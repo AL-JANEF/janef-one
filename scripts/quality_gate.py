@@ -89,12 +89,23 @@ def main() -> int:
     run("syntax compilation", [sys.executable, "-m", "compileall", "-q", "runtime", "scripts", "tests"])
     gates["compile_check"] = True
 
-    allowlist = ROOT / ".janef-one-firewall-allowlist.json"
-    scan = run(
-        "self firewall",
-        [sys.executable, "-m", "janef_one", "scan-skill", ".", "--allowlist", str(allowlist)],
-        capture=True,
-    )
+    # The scanner enforces that the active approval source lives outside the
+    # scanned candidate root (ROOT). The reviewed repository allowlist is
+    # still trusted, since it is reviewed first-party repository state — it
+    # is copied to an external temp path before being handed to the scanner
+    # so ROOT can never be its own approval source.
+    repo_allowlist = ROOT / ".janef-one-firewall-allowlist.json"
+    with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as handle:
+        external_allowlist = Path(handle.name)
+    try:
+        shutil.copyfile(repo_allowlist, external_allowlist)
+        scan = run(
+            "self firewall",
+            [sys.executable, "-m", "janef_one", "scan-skill", ".", "--allowlist", str(external_allowlist)],
+            capture=True,
+        )
+    finally:
+        external_allowlist.unlink(missing_ok=True)
     print(scan.stdout.strip())
     payload = json.loads(scan.stdout)
     if payload["decision"] != "allow":

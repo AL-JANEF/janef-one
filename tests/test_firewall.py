@@ -56,6 +56,59 @@ class FirewallTests(unittest.TestCase):
             result = SkillFirewall().scan(skill)
             self.assertEqual(result.decision, "allow")
 
+    def _write_allowlist(self, path: Path, fingerprint: str = "a" * 64) -> None:
+        path.write_text(
+            json.dumps({"version": 1, "approvals": [{"fingerprint": fingerprint, "reason": "reviewed and trusted"}]}),
+            encoding="utf-8",
+        )
+
+    def test_allowlist_inside_candidate_root_blocks(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            skill = Path(tmp) / "sample"
+            write_skill(skill, "Summarize files safely.")
+            allowlist = skill / ".janef-one-firewall-allowlist.json"
+            self._write_allowlist(allowlist)
+            result = SkillFirewall(allowlist_path=allowlist).scan(skill)
+            self.assertEqual(result.decision, "block")
+            self.assertTrue(any(item.code == "allowlist.untrusted-source" for item in result.findings))
+
+    def test_allowlist_path_traversal_into_candidate_root_blocks(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            skill = Path(tmp) / "sample"
+            write_skill(skill, "Summarize files safely.")
+            nested = skill / "sub"
+            nested.mkdir()
+            allowlist = skill / ".janef-one-firewall-allowlist.json"
+            self._write_allowlist(allowlist)
+            traversal_path = nested / ".." / ".janef-one-firewall-allowlist.json"
+            result = SkillFirewall(allowlist_path=traversal_path).scan(skill)
+            self.assertEqual(result.decision, "block")
+            self.assertTrue(any(item.code == "allowlist.untrusted-source" for item in result.findings))
+
+    def test_candidate_owned_allowlist_ignored_without_allowlist_flag(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            skill = Path(tmp) / "sample"
+            write_skill(skill, "Run `rm -rf /tmp/project` before starting.")
+            allowlist = skill / ".janef-one-firewall-allowlist.json"
+            self._write_allowlist(allowlist)
+            result = SkillFirewall().scan(skill)
+            self.assertEqual(result.decision, "block")
+            self.assertEqual(result.approved_findings, ())
+
+    def test_trusted_external_allowlist_still_works(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            skill = Path(tmp) / "sample"
+            write_skill(skill, "Run `rm -rf /tmp/project` before starting.")
+            probe = SkillFirewall().scan(skill)
+            finding = next(item for item in probe.findings if item.code == "destructive.shell")
+            external_dir = Path(tmp) / "external"
+            external_dir.mkdir()
+            allowlist = external_dir / "allowlist.json"
+            self._write_allowlist(allowlist, fingerprint=finding.fingerprint)
+            result = SkillFirewall(allowlist_path=allowlist).scan(skill)
+            self.assertEqual(result.decision, "allow")
+            self.assertTrue(any(item.fingerprint == finding.fingerprint for item in result.approved_findings))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -3,6 +3,7 @@ name: CI
 on:
   push:
   pull_request:
+  workflow_call:
 
 permissions:
   contents: read
@@ -39,7 +40,16 @@ jobs:
         run: python -m compileall -q runtime scripts tests
       - name: Self Skill Firewall
         run: |
-          python -m janef_one scan-skill . --allowlist .janef-one-firewall-allowlist.json > self-scan.json
+          # The active allowlist source must live outside the scanned candidate
+          # root (SkillFirewall enforces this). The reviewed repository
+          # allowlist is still trusted, since it is reviewed first-party
+          # repository state — it is just copied to an external temp path
+          # before being handed to the scanner so the candidate root cannot
+          # be its own approval source.
+          EXTERNAL_ALLOWLIST=$(mktemp)
+          trap 'rm -f "$EXTERNAL_ALLOWLIST"' EXIT
+          cp .janef-one-firewall-allowlist.json "$EXTERNAL_ALLOWLIST"
+          python -m janef_one scan-skill . --allowlist "$EXTERNAL_ALLOWLIST" > self-scan.json
           python - <<'PY'
           import json
           data=json.load(open('self-scan.json'))

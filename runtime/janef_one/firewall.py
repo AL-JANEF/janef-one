@@ -264,6 +264,22 @@ class SkillFirewall:
             finding = self._finding("critical", "format.not-directory", "skill root must be a directory", ".", 1)
             return SkillScanResult(0, "block", (finding,), (), 0, 0)
 
+        # A candidate package must never be able to approve its own findings.
+        # If the configured allowlist resolves to the candidate root itself,
+        # or anywhere underneath it, the approval source is untrusted and the
+        # scan fails closed rather than silently ignoring or trusting it.
+        if self.allowlist_path is not None:
+            resolved_allowlist = self.allowlist_path.resolve()
+            if resolved_allowlist == root_path or root_path in resolved_allowlist.parents:
+                finding = self._finding(
+                    "critical",
+                    "allowlist.untrusted-source",
+                    f"configured allowlist {resolved_allowlist} resolves inside scanned candidate root {root_path}",
+                    self.ALLOWLIST_NAME,
+                    1,
+                )
+                return SkillScanResult(0, "block", (finding,), (), 0, 0)
+
         try:
             approved_fingerprints = self._load_allowlist()
         except ValueError as exc:
