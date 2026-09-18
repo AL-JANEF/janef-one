@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "janef-one-runtime"
-version = "1.0.0"
+version = "1.0.1"
 description = "One kernel. Every agent. Runtime primitives for the JANEF ONE orchestration skill"
 readme = "README.md"
 requires-python = ">=3.11"

@@ -25,11 +25,11 @@ PYTHONPATH=runtime python3 -m janef_one route "Review this repository for releas
 bash examples/quick-demo.sh
 ```
 
-## الدليل التقني للإصدار v1.0.0
+## الدليل التقني للإصدار v1.0.1
 
-- **102/102** اختبارات Unit/Integration ناجحة.
+- **113/113** اختبارات Unit/Integration ناجحة.
 - **1,970/1,970** فحوص Benchmark حتمية ناجحة.
-- **90.03%** Runtime coverage.
+- **90.31%** Runtime coverage.
 - **100/100** Self-firewall مع قرار `allow`.
 - CI ناجح على Python 3.11 و3.12 و3.13.
 - CodeQL مفعل.

@@ -25,7 +25,7 @@ Expected shape:
 PYTHONPATH=runtime python3 -m janef_one scan-skill .
 ```
 
-The scanner reports a score, decision, and findings. JANEF ONE's own v1.0.0 release self-scan is required to reach `100/100` with `allow` before release.
+The scanner reports a score, decision, and findings. JANEF ONE's own v1.0.1 release self-scan is required to reach `100/100` with `allow` before release.
 
 ## 3. Persistent state integrity
 
