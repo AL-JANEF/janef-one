@@ -4,7 +4,7 @@ description: Master orchestration skill for complex agent work across research, 
 license: Apache-2.0
 compatibility: Portable Agent Skills package. Optional Python 3.11+ runtime adds routing, state, WorkGraph, static skill scanning, and benchmark utilities.
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
   maturity: "stable"
 ---
 

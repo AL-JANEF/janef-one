@@ -1,6 +1,6 @@
 """JANEF ONE runtime primitives."""
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 from .authority import AuthorityLevel, Instruction, resolve_instructions
 from .capabilities import Capability, CapabilityRegistry

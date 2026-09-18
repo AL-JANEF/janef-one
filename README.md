@@ -25,7 +25,7 @@
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-Apache--2.0-0b2748"></a>
   <img alt="Python" src="https://img.shields.io/badge/python-3.11%2B-00bcbc">
   <img alt="Agent Skills" src="https://img.shields.io/badge/Agent%20Skills-compatible-0b2748">
-  <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-00bcbc">
+  <img alt="Version" src="https://img.shields.io/badge/version-1.0.1-00bcbc">
 </p>
 
 > **Why JANEF ONE?** Agent stacks become fragile when routing, memory, permissions, verification, and overlapping skills are all handled ad hoc. JANEF ONE turns those concerns into one explicit orchestration layer.
@@ -86,11 +86,11 @@ bash examples/quick-demo.sh
 
 ## Proof, not promises
 
-The v1.0.0 release gate currently records:
+The v1.0.1 release gate currently records:
 
-- **102/102** unit and integration tests passing;
+- **113/113** unit and integration tests passing;
 - **1,970/1,970** deterministic runtime benchmark checks passing;
-- **90.03%** measured runtime coverage;
+- **90.31%** measured runtime coverage;
 - **100/100** self-firewall score with an `allow` decision;
 - clean wheel installation and CLI smoke tests passing;
 - reproducible ZIP packaging with identical SHA-256 on repeat builds;

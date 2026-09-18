@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.0.1 — 2026-09-19
+
+- Skill Firewall: allowlist trust-boundary enforcement, fails closed if the configured allowlist resolves inside the scanned candidate root.
+- Skill Firewall: prevented candidates from approving their own findings via an in-package allowlist.
+- Skill Firewall: scan `tests`/`test`/`evals`/`fixtures` executable surfaces in full; only narrow passive rule codes are relaxed there.
+- Skill Firewall: removed the path-based exemption for the scanner's own rule-declaration region.
+- Skill Firewall: scan extensionless scripts with a shebang as executable surfaces.
+- Skill Firewall: normalize deterministic basic shell obfuscation (`$IFS`, quote-split concatenation) before rule matching.
+- Added adversarial Skill Firewall tests for the above.
+- `scripts/quality_gate.py` now derives its PASS/FAIL score mechanically from gates that actually ran, instead of reporting a fixed score.
+- `scripts/validate.py` now validates `manifest.json`'s version format and checks `pyproject.toml`/`runtime/janef_one/__init__.py` for version drift.
+- Pinned GitHub Actions to exact commit SHAs.
+- `release.yml` now gates publish on exact-tag-SHA CI and CodeQL runs (`workflow_call`) instead of a direct-publish-on-tag path.
+- `scripts/publish_github.sh` refuses to stage untracked, non-ignored paths.
+- Documented that reviewed-exception approval and `explicit_authorization`/`target_verified` are trusted host inputs, not skill/candidate claims.
+
 ## 1.0.0 — 2026-09-17
 
 - Promoted JANEF ONE to a stable orchestration kernel.
