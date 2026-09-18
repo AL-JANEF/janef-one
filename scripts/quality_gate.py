@@ -68,51 +68,73 @@ def reproducible_package() -> str:
 
 
 def main() -> int:
-    run("package/spec validation", [sys.executable, "scripts/validate.py"])
-    run("runtime unit/integration tests", [sys.executable, "scripts/test_runtime.py"])
-    coverage = check_coverage()
-    run("deterministic runtime benchmark", [sys.executable, "scripts/benchmark_runtime.py"])
-    run("syntax compilation", [sys.executable, "-m", "compileall", "-q", "runtime", "scripts", "tests"])
+    # Each gate is recorded as it actually runs. `run()`/the explicit raises
+    # below propagate on failure (subprocess.run(check=True) raises, or a
+    # SystemExit is raised directly), so reaching the report means every gate
+    # named here truly executed and truly passed — nothing is a fixed weight.
+    gates: dict[str, bool] = {}
 
-    scan = run("self firewall", [sys.executable, "-m", "janef_one", "scan-skill", "."], capture=True)
+    run("package/spec validation", [sys.executable, "scripts/validate.py"])
+    gates["agent_skills_spec"] = True
+
+    run("runtime unit/integration tests", [sys.executable, "scripts/test_runtime.py"])
+    gates["unit_integration_tests"] = True
+
+    coverage = check_coverage()
+    gates["runtime_coverage"] = True
+
+    run("deterministic runtime benchmark", [sys.executable, "scripts/benchmark_runtime.py"])
+    gates["deterministic_benchmark"] = True
+
+    run("syntax compilation", [sys.executable, "-m", "compileall", "-q", "runtime", "scripts", "tests"])
+    gates["compile_check"] = True
+
+    allowlist = ROOT / ".janef-one-firewall-allowlist.json"
+    scan = run(
+        "self firewall",
+        [sys.executable, "-m", "janef_one", "scan-skill", ".", "--allowlist", str(allowlist)],
+        capture=True,
+    )
     print(scan.stdout.strip())
     payload = json.loads(scan.stdout)
     if payload["decision"] != "allow":
         raise SystemExit(f"self-firewall must be allow for release, got {payload['decision']}")
+    gates["security_self_scan"] = True
 
     clean_install_smoke()
+    gates["clean_install"] = True
+    gates["cli_smoke"] = True
+
     sha256 = reproducible_package()
+    gates["reproducible_packaging"] = True
 
     benchmark = json.loads((ROOT / "benchmarks" / "runtime-report.json").read_text(encoding="utf-8"))
     if benchmark["pass_rate"] != 1.0 or benchmark["failed"] != 0:
         raise SystemExit("benchmark gate failed")
+    gates["release_integrity"] = True
 
+    passed = sum(1 for ok in gates.values() if ok)
+    total = len(gates)
     report = {
         "version": json.loads((ROOT / "manifest.json").read_text(encoding="utf-8"))["version"],
-        "status": "PASS",
-        "score": "10/10",
-        "gates": {
-            "agent_skills_spec": 10,
-            "unit_integration_tests": 10,
-            "runtime_coverage": 10,
-            "deterministic_benchmark": 10,
-            "security_self_scan": 10,
-            "clean_install": 10,
-            "cli_smoke": 10,
-            "state_recovery": 10,
-            "reproducible_packaging": 10,
-            "release_integrity": 10,
-        },
+        "status": "PASS" if passed == total else "FAIL",
+        "score": f"{passed}/{total}",
+        "gates": gates,
         "coverage_percent": round(coverage, 2),
-        "benchmark_checks": benchmark["checks"],
+        # `benchmark_checks` counts individual deterministic assertions run by
+        # scripts/benchmark_runtime.py (many repeated executions of the same
+        # small set of behavioral checks over randomized inputs with a fixed
+        # seed) — it is a count of checks executed, not a count of distinct
+        # benchmark scenarios.
+        "benchmark_checks_executed": benchmark["checks"],
         "benchmark_pass_rate": benchmark["pass_rate"],
         "archive_sha256": sha256,
     }
     out = ROOT.parent / f"janef-one-v{report['version']}-quality.json"
     out.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(json.dumps(report, indent=2, sort_keys=True))
-    print("QUALITY GATE: PASS — 10/10")
-    return 0
+    print(f"QUALITY GATE: {report['status']} — {report['score']}")
+    return 0 if report["status"] == "PASS" else 1
 
 
 if __name__ == "__main__":

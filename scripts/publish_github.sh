@@ -79,7 +79,18 @@ if [[ ! -d .git ]]; then
   git init -b main
 fi
 
-git add .
+echo "==> stage release contents"
+# Refuse a blind `git add .`: fail closed if any untracked path is not
+# covered by .gitignore, so nothing unexpected (local scratch state,
+# accidentally-created secrets, tool caches) is ever silently published.
+UNEXPECTED="$(git status --porcelain=v1 | awk '$1=="??"{print $2}')"
+if [[ -n "$UNEXPECTED" ]]; then
+  echo "Refusing to stage: untracked, non-ignored paths present:" >&2
+  echo "$UNEXPECTED" >&2
+  echo "Add them to .gitignore or commit them explicitly, then re-run." >&2
+  exit 1
+fi
+git add -A
 if ! git diff --cached --quiet; then
   git commit -m "feat: launch JANEF ONE v${VERSION}"
 fi
@@ -135,12 +146,12 @@ if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
   gh release upload "$TAG" "${ASSETS[@]}" --repo "$REPO" --clobber
   gh release edit "$TAG" --repo "$REPO" \
     --title "JANEF ONE ${TAG} — One kernel. Every agent." \
-    --notes-file RELEASE_NOTES_v1.0.0.md
+    --notes-file "RELEASE_NOTES_v${VERSION}.md"
 else
   gh release create "$TAG" "${ASSETS[@]}" \
     --repo "$REPO" \
     --title "JANEF ONE ${TAG} — One kernel. Every agent." \
-    --notes-file RELEASE_NOTES_v1.0.0.md
+    --notes-file "RELEASE_NOTES_v${VERSION}.md"
 fi
 
 cat <<MSG

@@ -24,6 +24,16 @@ class ActionClass(str, Enum):
 
 @dataclass(frozen=True, slots=True)
 class ActionRequest:
+    """A request to gate a consequential action.
+
+    `explicit_authorization` and `target_verified` are trusted host/runtime
+    inputs. They record that the *host* has confirmed authorization and
+    verified the exact target, not that some skill or prompt merely asserts
+    it. They must never be set from untrusted skill content, retrieved
+    prompts/documents, tool output, or any candidate package — only from the
+    trusted caller that constructs the request.
+    """
+
     action: str
     action_class: ActionClass
     target: str = ""

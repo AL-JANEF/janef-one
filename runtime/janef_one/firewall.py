@@ -158,15 +158,41 @@ class SkillFirewall:
 
     TEXT_SUFFIXES = {".md", ".txt", ".py", ".sh", ".bash", ".zsh", ".js", ".mjs", ".cjs", ".ts", ".json", ".yaml", ".yml", ".toml", ".ps1"}
     EXEC_SUFFIXES = {".py", ".sh", ".bash", ".zsh", ".js", ".mjs", ".cjs", ".ts", ".ps1"}
-    EXCLUDED_PARTS = {".git", "__pycache__", "tests", "test", "evals", "fixtures", ".source_cache", ".venv", "node_modules", "dist", "build"}
+    EXCLUDED_PARTS = {".git", "__pycache__", ".source_cache", ".venv", "node_modules", "dist", "build"}
+    FIXTURE_PARTS = {"tests", "test", "evals", "fixtures"}
+    # Non-executable_only rules that are prone to false positives on descriptive
+    # or sample text data. Only relaxed for passive (non-executable-surface)
+    # files inside FIXTURE_PARTS directories; executable/script/config surfaces
+    # get full scanning everywhere, including inside these directories.
+    PASSIVE_FIXTURE_LENIENT_CODES = {"destructive.shell", "prompt.override", "authority.claim", "secrets.read"}
     ALLOWLIST_NAME = ".janef-one-firewall-allowlist.json"
 
-    def __init__(self, *, max_files: int = 5000, max_file_bytes: int = 2_000_000, max_total_bytes: int = 50_000_000) -> None:
+    # Deterministic normalizations for straightforward shell/script obfuscation:
+    # $IFS-based whitespace substitution and quote-split string concatenation.
+    _DEOBFUSCATION_STEPS: tuple[tuple[re.Pattern[str], str], ...] = (
+        (re.compile(r"\$\{IFS\}|\$IFS\b"), " "),
+        (re.compile(r"""(['"])\s*\+\s*(?=['"])"""), ""),
+        (re.compile(r"""['"]"""), ""),
+    )
+
+    def __init__(
+        self,
+        *,
+        max_files: int = 5000,
+        max_file_bytes: int = 2_000_000,
+        max_total_bytes: int = 50_000_000,
+        allowlist_path: str | Path | None = None,
+    ) -> None:
         if min(max_files, max_file_bytes, max_total_bytes) < 1:
             raise ValueError("scan limits must be positive")
         self.max_files = max_files
         self.max_file_bytes = max_file_bytes
         self.max_total_bytes = max_total_bytes
+        # Reviewed exceptions are only ever honored from a path the *caller*
+        # explicitly names (trusted host/operator input). A scanned package
+        # can never cause its own findings to be approved: nothing inside
+        # `root` is ever auto-discovered or auto-trusted as an allowlist.
+        self.allowlist_path = Path(allowlist_path) if allowlist_path is not None else None
 
     @staticmethod
     def _fingerprint(code: str, path: str, message: str) -> str:
@@ -176,10 +202,42 @@ class SkillFirewall:
     def _finding(self, severity: str, code: str, message: str, path: str, line: int) -> Finding:
         return Finding(severity, code, message, path, line, self._fingerprint(code, path, message))
 
-    def _load_allowlist(self, root: Path) -> set[str]:
-        path = root / self.ALLOWLIST_NAME
-        if not path.exists():
+    @classmethod
+    def _deobfuscate(cls, line: str) -> str:
+        result = line
+        for pattern, repl in cls._DEOBFUSCATION_STEPS:
+            result = pattern.sub(repl, result)
+        return result
+
+    @staticmethod
+    def _has_shebang(path: Path) -> bool:
+        try:
+            with path.open("rb") as handle:
+                head = handle.read(64)
+        except OSError:
+            return False
+        return head.startswith(b"#!")
+
+    def _load_allowlist(self) -> set[str]:
+        """Load reviewed-exception fingerprints from an explicitly trusted path.
+
+        The allowlist location is never auto-discovered from inside the
+        scanned package root; it is only ever the path a trusted caller
+        explicitly configured on this instance (e.g. host/CI code scanning
+        its own reviewed repository, or an operator-supplied `--allowlist`).
+        A scanned candidate package cannot cause its own files to be read as
+        approvals: nothing about `scan()`'s `root` argument feeds this path.
+        If the caller did not configure an allowlist, there are no approvals
+        (fail closed: every finding stays active). If the caller configured
+        a path and it is missing or malformed, that is treated as ambiguous
+        approval provenance and the scan blocks rather than silently
+        granting zero or partial exceptions.
+        """
+        if self.allowlist_path is None:
             return set()
+        path = self.allowlist_path
+        if not path.is_file():
+            raise ValueError(f"configured firewall allowlist does not exist: {path}")
         try:
             raw = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as exc:
@@ -207,7 +265,7 @@ class SkillFirewall:
             return SkillScanResult(0, "block", (finding,), (), 0, 0)
 
         try:
-            approved_fingerprints = self._load_allowlist(root_path)
+            approved_fingerprints = self._load_allowlist()
         except ValueError as exc:
             finding = self._finding("critical", "allowlist.invalid", str(exc), self.ALLOWLIST_NAME, 1)
             return SkillScanResult(0, "block", (finding,), (), 0, 0)
@@ -245,10 +303,18 @@ class SkillFirewall:
             if total_bytes > self.max_total_bytes:
                 findings.append(self._finding("critical", "resource.total-bytes", f"scan exceeds max_total_bytes={self.max_total_bytes}", rel_path.as_posix(), 1))
                 break
-            if size > self.max_file_bytes and path.suffix.lower() in self.TEXT_SUFFIXES:
+
+            suffix = path.suffix.lower()
+            is_known_text = suffix in self.TEXT_SUFFIXES
+            # Extensionless scripts (no recognized suffix) are still executable
+            # surfaces when they carry a shebang; content must be scanned like
+            # any other script, not silently treated as an opaque binary.
+            has_shebang = False if is_known_text else self._has_shebang(path)
+
+            if size > self.max_file_bytes and (is_known_text or has_shebang):
                 findings.append(self._finding("high", "resource.file-bytes", f"text file exceeds max_file_bytes={self.max_file_bytes}", rel_path.as_posix(), 1))
                 continue
-            if path.suffix.lower() not in self.TEXT_SUFFIXES:
+            if not is_known_text and not has_shebang:
                 # Executable unknown binaries are not valid passive skill resources.
                 if os.access(path, os.X_OK):
                     findings.append(self._finding("high", "binary.executable", "unrecognized executable file in skill package", rel_path.as_posix(), 1))
@@ -260,24 +326,24 @@ class SkillFirewall:
                 findings.append(self._finding("medium", "text.invalid-utf8", "declared text file is not valid UTF-8", rel_path.as_posix(), 1))
                 continue
             rel = rel_path.as_posix()
-            executable = self._is_executable_surface(rel_path)
+            executable = has_shebang or self._is_executable_surface(rel_path)
+            in_fixture_dir = any(part in self.FIXTURE_PARTS for part in rel_path.parts)
             lines = text.splitlines()
-            rule_definition_lines: set[int] = set()
-            if rel.endswith("runtime/janef_one/firewall.py"):
-                # The scanner's own detection regexes intentionally contain the
-                # strings they detect. Exclude only the RULES declaration region,
-                # not the rest of the executable file.
-                start_rule = next((i for i, value in enumerate(lines, start=1) if "RULES: tuple[_Rule" in value), None)
-                end_rule = next((i for i, value in enumerate(lines, start=1) if value.lstrip().startswith("TEXT_SUFFIXES =")), None)
-                if start_rule is not None and end_rule is not None and start_rule < end_rule:
-                    rule_definition_lines = set(range(start_rule, end_rule))
             for line_no, line in enumerate(lines, start=1):
-                if line_no in rule_definition_lines:
-                    continue
                 for rule in self.RULES:
                     if rule.executable_only and not executable:
                         continue
-                    if rule.pattern.search(line):
+                    if in_fixture_dir and not executable and rule.code in self.PASSIVE_FIXTURE_LENIENT_CODES:
+                        # Passive (non-executable-surface) sample/fixture data
+                        # may narrowly avoid content-pattern findings. This
+                        # never applies to executable/script/config surfaces,
+                        # which are always scanned in full, including inside
+                        # tests/fixtures directories.
+                        continue
+                    matched = rule.pattern.search(line)
+                    if not matched and executable:
+                        matched = rule.pattern.search(self._deobfuscate(line))
+                    if matched:
                         message = line.strip()[:300]
                         findings.append(self._finding(rule.severity, rule.code, message, rel, line_no))
 
